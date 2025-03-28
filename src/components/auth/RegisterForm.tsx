@@ -1,12 +1,14 @@
 "use client";
 import { useState } from "react";
-import { toast } from "sonner"; // Import Sonner toast
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 export default function RegisterForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,26 +28,23 @@ export default function RegisterForm() {
     }
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/register`, {
-        method: "POST",
-        body: JSON.stringify({ email, password }),
-        headers: { "Content-Type": "application/json" },
-      });
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/register`,
+        {
+          method: "POST",
+          body: JSON.stringify({ email, password }),
+          headers: { "Content-Type": "application/json" },
+        }
+      );
 
       const data = await res.json();
-
-      console.log(
-        "\n\n>>>>>>>>>>>>>>>>>>>>>>>> data <<<<<<<<<<<<<<<<<<<<<\n\n"
-      );
-      console.log(data);
-      console.log("\n\n>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<\n\n");
 
       if (!res.ok) {
         throw new Error(data.message || "Registration failed");
       }
 
-      toast.success("Account created successfully!");
-      //TODO Redirect or trigger login state change if needed
+      toast.success("Account created successfully! Log in to continue.");
+      router.push("/login");
     } catch (error) {
       const errorMessage =
         error instanceof Error
