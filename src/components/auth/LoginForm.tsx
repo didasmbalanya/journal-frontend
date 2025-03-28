@@ -39,6 +39,7 @@ export default function LoginForm() {
 
       localStorage.setItem("token", access_token);
       localStorage.setItem("role", role);
+      localStorage.setItem("email", email);
 
       toast.success("Logged in successfully!");
       // Redirect based on role
