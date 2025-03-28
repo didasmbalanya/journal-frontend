@@ -39,14 +39,12 @@ export default function LoginForm() {
       localStorage.setItem("role", role);
 
       toast.success("Logged in successfully!");
-      
       // Redirect based on role
       if (role === "admin") {
         router.push("/admin/dashboard");
       } else {
         router.push("/journals");
       }
-
     } catch (error) {
       const errorMessage =
         error instanceof Error
