@@ -2,6 +2,8 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 export default function LoginForm() {
   const router = useRouter();
@@ -57,24 +59,42 @@ export default function LoginForm() {
   };
 
   return (
-    <form onSubmit={handleLogin} className="space-y-4">
-      <input
-        type="email"
-        placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        className="input-field"
-      />
-      <input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        className="input-field"
-      />
-      <button type="submit" disabled={loading} className="btn-primary">
-        {loading ? "Logging in..." : "Login"}
-      </button>
-    </form>
+    <div className="flex flex-col items-center p-6 bg-white shadow-md rounded-lg max-w-sm mx-auto">
+      <h2 className="text-2xl font-bold mb-4">Login</h2>
+      <form className="w-full space-y-4" onSubmit={handleLogin}>
+        <Input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+        <Input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
+        <Button
+          type="submit"
+          className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 transition-all"
+          disabled={loading}
+        >
+          {loading ? "Logging in..." : "Login"}
+        </Button>
+
+        <div className="text-sm text-gray-500 mt-4">
+          Don&apos;t have an account?{" "}
+            <button
+            type="button"
+            className="text-blue-600 hover:underline"
+            onClick={() => router.push("/register")}
+            >
+            Register here
+            </button>
+        </div>
+      </form>
+    </div>
   );
 }
