@@ -1,8 +1,10 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
+First create a .env.local file and the values bellow
+- NEXT_PUBLIC_API_URL={Backend API URL}
 
-First, run the development server:
+Then, run the development server:
 
 ```bash
 npm run dev

@@ -1,54 +1,67 @@
 "use client";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
-const LoginForm = () => {
+export default function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const res = await signIn("credentials", {
-      email,
-      password,
-      redirect: false,
-    });
 
-    if (res?.ok) {
-      router.push("/dashboard");
-    } else {
-      alert("Invalid credentials");
+    if (!email || !password) {
+      toast.error("All fields are required.");
+      setLoading(false);
+      return;
     }
-    setLoading(false);
+
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
+        method: "POST",
+        body: JSON.stringify({ email, password }),
+        headers: { "Content-Type": "application/json" },
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message || "Login failed");
+      }
+
+      toast.success("Logged in successfully!");
+      //TODO Redirect or reload after login
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "An error occurred. Try again.";
+      toast.error(errorMessage);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <form className="space-y-4" onSubmit={handleLogin}>
-      <Input
+    <form onSubmit={handleLogin} className="space-y-4">
+      <input
         type="email"
         placeholder="Email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
-        required
+        className="input-field"
       />
-      <Input
+      <input
         type="password"
         placeholder="Password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
-        required
+        className="input-field"
       />
-      <Button type="submit" disabled={loading}>
+      <button type="submit" disabled={loading} className="btn-primary">
         {loading ? "Logging in..." : "Login"}
-      </Button>
+      </button>
     </form>
   );
-};
-
-export default LoginForm;
+}

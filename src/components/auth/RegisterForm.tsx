@@ -1,52 +1,88 @@
 "use client";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import axios from "axios";
-import { useRouter } from "next/navigation";
+import { toast } from "sonner"; // Import Sonner toast
 
-const RegisterForm = () => {
+export default function RegisterForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
-    try {
-      await axios.post("/api/auth/register", { email, password });
-      router.push("/login");
-    } catch (error) {
-      console.log(error);
-      alert("Registration failed");
+    // Basic validation
+    if (!email || !password || !confirmPassword) {
+      toast.error("All fields are required.");
+      setLoading(false);
+      return;
     }
 
-    setLoading(false);
+    if (password !== confirmPassword) {
+      toast.error("Passwords do not match.");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/register`, {
+        method: "POST",
+        body: JSON.stringify({ email, password }),
+        headers: { "Content-Type": "application/json" },
+      });
+
+      const data = await res.json();
+
+      console.log(
+        "\n\n>>>>>>>>>>>>>>>>>>>>>>>> data <<<<<<<<<<<<<<<<<<<<<\n\n"
+      );
+      console.log(data);
+      console.log("\n\n>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<\n\n");
+
+      if (!res.ok) {
+        throw new Error(data.message || "Registration failed");
+      }
+
+      toast.success("Account created successfully!");
+      //TODO Redirect or trigger login state change if needed
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "An error occurred. Try again.";
+      toast.error(errorMessage);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <form className="space-y-4" onSubmit={handleRegister}>
-      <Input
+    <form onSubmit={handleRegister} className="space-y-4">
+      <input
         type="email"
         placeholder="Email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
-        required
+        className="input-field"
       />
-      <Input
+      <input
         type="password"
         placeholder="Password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
-        required
+        className="input-field"
       />
-      <Button type="submit" disabled={loading}>
+      <input
+        type="password"
+        placeholder="Confirm Password"
+        value={confirmPassword}
+        onChange={(e) => setConfirmPassword(e.target.value)}
+        className="input-field"
+      />
+      <button type="submit" disabled={loading} className="btn-primary">
         {loading ? "Registering..." : "Register"}
-      </Button>
+      </button>
     </form>
   );
-};
-
-export default RegisterForm;
+}
