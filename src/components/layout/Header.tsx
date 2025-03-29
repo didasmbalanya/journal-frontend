@@ -76,7 +76,7 @@ export default function Header() {
             <span>Journal</span>
           </Link>
 
-          <div>
+          <div className="flex items-center">
             {isLoading ? (
               <div className="animate-pulse w-20 h-10 bg-gray-200 rounded-lg" />
             ) : user ? (
