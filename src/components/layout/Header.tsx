@@ -31,6 +31,8 @@ export default function Header() {
     try {
       setIsLoading(true);
       localStorage.removeItem("token");
+      localStorage.removeItem("email");
+      localStorage.removeItem("role");
       setUser(null);
       await router.push("/");
     } catch (error) {
