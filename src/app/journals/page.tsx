@@ -15,6 +15,7 @@ type Journal = {
 export default function JournalsPage() {
   const [journals, setJournals] = useState<Journal[]>([]);
   const [selectedJournal, setSelectedJournal] = useState<Journal | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
   // Add pagination state
@@ -31,9 +32,24 @@ export default function JournalsPage() {
   const totalPages = Math.ceil(journals.length / journalsPerPage);
 
   useEffect(() => {
+    const checkAuth = () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        router.push("/");
+        return;
+      }
+      setIsLoading(false);
+    };
+
+    checkAuth();
+  }, [router]);
+
+  useEffect(() => {
     const fetchJournals = async () => {
       try {
         const token = localStorage.getItem("token");
+        if (!token) return;
+
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/journals`, {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -46,8 +62,11 @@ export default function JournalsPage() {
         );
       }
     };
-    fetchJournals();
-  }, []);
+
+    if (!isLoading) {
+      fetchJournals();
+    }
+  }, [isLoading]);
 
   const handleDelete = async (id: number) => {
     if (!confirm("Are you sure you want to delete this journal?")) return;
@@ -67,11 +86,18 @@ export default function JournalsPage() {
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="animate-pulse text-gray-500">Loading...</div>
+      </div>
+    );
+  }
+
   return (
     <div className="pt-20 p-6 flex gap-6 bg-gradient-to-b from-gray-50 to-gray-100 min-h-screen">
       {/* Left Side - Journal List */}
       <div className="w-1/3 space-y-4 h-[calc(100vh-6rem)] overflow-y-auto">
-        
         <Button
           onClick={() => router.push("/journals/create")}
           className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 transition-all"
