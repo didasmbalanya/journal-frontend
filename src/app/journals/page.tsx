@@ -71,9 +71,12 @@ export default function JournalsPage() {
   const handleDelete = async (id: number) => {
     if (!confirm("Are you sure you want to delete this journal?")) return;
     try {
+      const token = localStorage.getItem("token");
+
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/journals/${id}`,
         {
+          headers: { Authorization: `Bearer ${token}` },
           method: "DELETE",
         }
       );
