@@ -44,9 +44,9 @@ export default function LoginForm() {
       toast.success("Logged in successfully!");
       // Redirect based on role
       if (role === "admin") {
-        router.push("/admin/dashboard");
+        window.location.href = "/admin/dashboard";
       } else {
-        router.push("/journals");
+        window.location.href = "/journals";
       }
     } catch (error) {
       const errorMessage =
